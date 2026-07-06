@@ -30,6 +30,10 @@
             <div class="card-body">
                 <!-- Formulario para agregar personas -->
                  <form id="formPeople">
+
+                     <!-- ID de la persona para el  momento de actualizar lo -->
+                        <input type="hidden" id="idPerson">
+
                     <div class="form-group my-3">
                         <label for="txtName" class="form-label">Nombre:</label>
                         <input type="text" id="txtName" class="form-control" required>
@@ -43,6 +47,7 @@
                         <input type="text" id="txtNumber" class="form-control" required> 
                     </div>
                     <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar persona</button>
+                    <button type="button" id="btnCancelar" class="btn btn-secondary d-none">Cancelar</button>
                  </form>
             </div>
         </section>

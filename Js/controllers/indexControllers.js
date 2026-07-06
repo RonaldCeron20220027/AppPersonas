@@ -1,4 +1,4 @@
-import { getPeople, createPeople, deletePeople } from "../services/peopleService.js";
+import { getPeople, createPeople, deletePeople, getPeson, updatePerson } from "../services/peopleService.js";
 
 //Referenicas al TBODY
 const tablasPersonas = document.getElementById("tablaPersonas");
@@ -9,6 +9,10 @@ const txtName = document.getElementById("txtName");
 const txtEmail = document.getElementById("txtEmail");
 const txtNumber = document.getElementById("txtNumber");
 const btnGuardar = document.getElementById("btnGuardar");
+const btnCancelar = document.getElementById("btnCancelar");
+
+const idPerson = document.getElementById("idPerson");//Campo Hidden
+
 
 
 //Funcion para mostrar a las peronas en la tablas
@@ -27,7 +31,7 @@ async function mostrarPersonas(){
                     <td>${persona.phone}</td>
                     <td>
                         <button class="btn btn-danger" onclick="borrarPersona(${persona.id})">🗑️</button>
-                        <button class="btn btn-warning">🖊️</button>
+                        <button class="btn btn-warning" onclick = "colocarDatosFormulario(${persona.id})">🖊️</button>
                     </td>
                  </tr>
             `;
@@ -49,6 +53,7 @@ document.addEventListener("DOMContentLoaded", async function(){
 frmPeople.addEventListener("submit", async function(e){
     e.preventDefault();//Evta quue el formulario se envie
 
+    const id = idPerson.value.trim();//<----
     const name = txtName.value.trim();
     const email = txtEmail.value.trim();
     const phone = txtNumber.value.trim();
@@ -66,8 +71,21 @@ frmPeople.addEventListener("submit", async function(e){
     }
 
     try{
-        await createPeople(perona);//Se envia el objecto al Service para ir a la API
-        alert("La persona a sido creada");
+        //Si el ID no esta vacio, estamoss editando
+        if(id != ""){
+            await updatePerson(id,perona);
+            alert("La persona se ha actualizado correctamente")
+        }
+        //Si el ID esta vacio
+        else{
+            await createPeople(perona);//Se envia el objecto al Service para ir a la API
+            alert("La persona a sido creada");
+        }
+
+        //Resetear el formulario con 
+        limpiarFormulario();
+        //Recagar la listas
+        await mostrarPersonas();
     }
     catch(error){
         alert("No se pudo guardara la persona: " + error);
@@ -82,6 +100,10 @@ frmPeople.addEventListener("submit", async function(e){
 
 function limpiarFormulario(){
     frmPeople.reset();//Borra los valores de los campos
+
+    idPerson.value = "";//Vaciamos el ID para evitar errores
+    btnGuardar.textContent ="Guardar Persona";//Restauramos boton de guardar
+    btnCancelar.classList.add("d-none");
 }
 
 //Funcion para borrar a una persona
@@ -103,4 +125,29 @@ async function borrarPersona(id){
     }
 }
 
+//Funcion para cargar los datos de la persona en ele formulario y editar
+async function colocarDatosFormulario(id){
+
+    try{
+        const persona = await getPeson(id);//Traemos los datos de la persona
+
+        //Colocamos los valores que vienen en el JSON dentro de los campos
+        idPerson.value = persona.id;
+        txtName.value = persona.name;
+        txtEmail.value = persona.email;
+        txtNumber.value = persona.phone;
+        
+        btnGuardar.textContent = "Actualizar persona"; //Se cambia el texto temporalmete
+        btnCancelar.classList.remove("d-none");//El boton cancelar aparece
+    }
+    catch(error){
+        alert("Error al cargar los datos de la perosna " + error);
+        console.error(error);
+    }
+}
+
+//Enlazar el boton de cancelar con limpiarFormulario
+btnCancelar.addEventListener("click", limpiarFormulario);
+
 window.borrarPersona = borrarPersona;
+window.colocarDatosFormulario = colocarDatosFormulario;

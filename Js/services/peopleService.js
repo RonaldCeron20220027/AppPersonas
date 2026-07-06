@@ -61,3 +61,46 @@ export async function deletePeople(id){
         throw error;
     }
 }
+
+export async function getPeson(id){
+    try{
+        //Llamado a la API
+        const repuesta = await fetch(`${API_URL}/${id}`);
+        //GET por defecto
+
+        //Validamos si hubo error en la llamada a la API
+        if(!repuesta.ok){
+            throw new Error("Error al obtenre a la personas");
+        }
+
+        const personas = await repuesta.json();//Convertimos a JSON
+
+        return personas;//Enviamos el JSON al controller
+    }
+    catch(error){
+        console.error("Error al cargar a la persona");
+        throw error;//Propagar la ecepcion al siguiente try-catch
+    }
+}
+
+export async function updatePerson(id,perona){
+    try{
+        const repuesta = await fetch(`${API_URL}/${id}`, {
+            method: "PUT",
+            headers : {
+                "Content-Type" : "application/json"
+            } ,
+            body : JSON.stringify(perona)
+        });
+
+        if(!repuesta.ok){
+            throw new Error("Error al actualizar a la persona " + repuesta.statusText);
+        }
+
+        const personaActulizada = await repuesta.json();
+        return personaActulizada;//Retornar la persona actualizada al controller
+    }
+    catch(error){
+        console.error(error);
+    }
+}
